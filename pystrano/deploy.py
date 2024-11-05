@@ -142,7 +142,7 @@ def install_requirements(c, new_release_dir):
 def collect_static_files(c, new_release_dir):
     # Collect static files to the shared directory
     with c.cd(new_release_dir):
-        c.run(f'{PYTHON_PATH} manage.py collectstatic --noinput --link', env=ENV_VARS)
+        c.run(f'{PYTHON_PATH} manage.py collectstatic --noinput', env=ENV_VARS)
 
 
 def migrate_database(c, new_release_dir):
