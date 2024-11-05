@@ -1,7 +1,5 @@
 # Pystrano
 
----
-
 Pystrano is a simple deployment tool for Python projects.
 It is inspired by Capistrano, a popular deployment tool for
 Ruby projects.
