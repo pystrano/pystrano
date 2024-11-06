@@ -22,20 +22,24 @@ to create a config for the environment you want to deploy to.
 
 ### Configuration
 
-Pystrano uses a YAML file to configure the deployment.
-Here is a description of variables you can set in the
-config file:
+Pystrano uses a YAML file to configure the deployment. It contains two sections: `common` and `servers`. Variables in `common` section are shared across all servers, while in `servers` section you define a list of servers to deploy to. It is also possible to define server-specific variables, which will override the common ones (if defined).
 
-- `repo_url`: The URL of the git repository.
+Here is a description of variables you can set in the config file:
+
+- `source_code_url`: The URL of the git repository.
+- `project_root`: The directory where the project is located.
 - `project_user`: The user that will be used to deploy the project.
-- `project_dir`: The directory where the project is located.
 - `venv_dir`: The directory where the virtual environment is located (in the `project_user` home).
-- `servers`: A list of servers to deploy to (hostname or ip addresses separated by `;`).
-- `keep_releases`: The number of releases to keep on the server.
+- `keep_releases`: The number of releases to keep on the server. If set to 0 or less, all releases will be kept.
 - `system_packages`: A list of system packages to install on the server (during setup).
 - `env_file`: The path to the environment file to use for the deployment.
 - `ssh_known_hosts`: The path to the known hosts file to use for the deployment (during setup; separated by `;`).
-- `gunicorn_service_file`: The path to the gunicorn service file to use for the deployment.
+- `service_file`: The path to the gunicorn service file to use for the deployment.
+- `branch`: The branch to deploy.
+
+Server-specific variables:
+
+- `host`: The hostname of the server.
 
 ### Deployment
 
