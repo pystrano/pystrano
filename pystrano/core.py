@@ -42,9 +42,9 @@ def update_symlink(connection: Connection, new_release_dir: str, conf: PystranoC
     connection.run(f'ln -sfn {new_release_dir} {conf.current_dir}')
 
 
-def restart_gunicorn(connection: Connection):
+def restart_service(connection: Connection, conf: PystranoConfig):
     """Restart the Gunicorn service."""
-    connection.sudo('systemctl restart gunicorn.service')
+    connection.sudo(f'systemctl restart {conf.service_file_name}')
 
 
 def cleanup_old_releases(connection: Connection, conf: PystranoConfig):
@@ -116,11 +116,11 @@ def setup_known_hosts(connection: Connection, conf: PystranoConfig):
     connection.run(f'chown {conf.project_user}:{conf.project_user} /home/{conf.project_user}/.ssh/known_hosts')
 
 
-def setup_gunicorn_service(connection: Connection, conf: PystranoConfig):
-    """Set up the Gunicorn service."""
-    connection.put(conf.service_file, '/etc/systemd/system/gunicorn.service')
+def setup_service(connection: Connection, conf: PystranoConfig):
+    """Set up the service."""
+    connection.put(conf.service_file, f'/etc/systemd/system/{conf.service_file_name}')
     connection.sudo('systemctl daemon-reload')
-    connection.sudo('systemctl enable gunicorn.service')
+    connection.sudo(f'systemctl enable {conf.service_file_name}')
 
 
 def try_to_remove_release_dir(connection: Connection, release_dir: str):

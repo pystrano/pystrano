@@ -46,6 +46,9 @@ class PystranoConfig(object):
         if hasattr(self, "env_file"):
             setattr(self, "env_vars", self._load_env_file())
 
+        if hasattr(self, "service_file"):
+            setattr(self, "service_file_name", path.basename(self.service_file))
+
 
 
 def create_server_config(server_description: dict, common_config: dict) -> PystranoConfig:

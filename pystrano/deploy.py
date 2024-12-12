@@ -11,7 +11,7 @@ from .core import (
     collect_static_files,
     migrate_database,
     update_symlink,
-    restart_gunicorn,
+    restart_service,
     cleanup_old_releases,
     try_to_remove_release_dir,
     create_project_user,
@@ -20,7 +20,7 @@ from .core import (
     setup_packages,
     setup_venv,
     setup_known_hosts,
-    setup_gunicorn_service,
+    setup_service,
     copy_env_file
 )
 
@@ -49,8 +49,9 @@ def set_up(server_configurations: list[PystranoConfig]):
             print("Setting up known hosts")
             setup_known_hosts(c, server_config)
 
-            print("Setting up Gunicorn service")
-            setup_gunicorn_service(c, server_config)
+            if hasattr(server_config, "service_file"):
+                print("Setting up service that should be executed")
+                setup_service(c, server_config)
         except Exception as e:
             print(f"Error setting up {server_config.host}: {e}")
             continue
@@ -90,8 +91,9 @@ def deploy(server_configurations: list[PystranoConfig]):
             print("Updating symlinks")
             update_symlink(c, new_release_dir, server_config)
 
-            print("Restarting Gunicorn")
-            restart_gunicorn(c)
+            if hasattr(server_config, "service_file"):
+                print("Restarting service")
+                restart_service(c, server_config)
 
             print("Cleaning up old releases")
             cleanup_old_releases(c, server_config)

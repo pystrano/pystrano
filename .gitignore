@@ -4,3 +4,4 @@ config
 dist
 pystrano.egg-info
 venv
+.DS_Store
