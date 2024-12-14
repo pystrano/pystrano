@@ -7,6 +7,7 @@ class PystranoConfig(object):
     """A class to represent a Pystrano server configuration."""
     def __init__(self):
         self._config_finalized = False
+
     def update_dict(self, data):
         """Update the configuration with the given key-value pairs overwriting previous values."""
         self.__dict__.update(**data)
@@ -48,6 +49,16 @@ class PystranoConfig(object):
 
         if hasattr(self, "service_file"):
             setattr(self, "service_file_name", path.basename(self.service_file))
+
+        if hasattr(self, "run_migrations"):
+            setattr(self, "run_migrations", self.run_migrations.lower() == "true")
+        else:
+            setattr(self, "run_migrations", False)
+
+        if hasattr(self, "collect_static_files"):
+            setattr(self, "collect_static_files", self.collect_static_files.lower() == "true")
+        else:
+            setattr(self, "collect_static_files", False)
 
 
 

@@ -82,11 +82,13 @@ def deploy(server_configurations: list[PystranoConfig]):
             print("Installing requirements")
             install_requirements(c, new_release_dir, server_config)
 
-            print("Collecting static files")
-            collect_static_files(c, new_release_dir, server_config)
+            if hasattr(server_config, "collect_static_files") and server_config.collect_static_files:
+                print("Collecting static files")
+                collect_static_files(c, new_release_dir, server_config)
 
-            print("Migrating database")
-            migrate_database(c, new_release_dir, server_config)
+            if hasattr(server_config, "run_migrations") and server_config.run_migrations:
+                print("Migrating database")
+                migrate_database(c, new_release_dir, server_config)
 
             print("Updating symlinks")
             update_symlink(c, new_release_dir, server_config)
