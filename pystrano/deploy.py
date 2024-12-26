@@ -29,7 +29,7 @@ def set_up(server_configurations: list[PystranoConfig]):
     for server_config in server_configurations:
         try:
             print(f"Setting up {server_config.host}")
-            c = Connection(f"root@{server_config.host}")
+            c = Connection(f"root@{server_config.host}", forward_agent=True)
 
             print("Creating project user")
             create_project_user(c, server_config)
