@@ -65,7 +65,7 @@ def deploy(server_configurations: list[PystranoConfig]):
             new_release_dir = f"{server_config.releases_dir}/{timestamp}"
 
             print(f"Deploying to {server_config.host}")
-            c = Connection(f"{server_config.project_user}@{server_config.host}")
+            c = Connection(f"{server_config.project_user}@{server_config.host}", forward_agent=True)
 
             print("Creating release directory")
             setup_release_dir(c, new_release_dir)
