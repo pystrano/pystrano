@@ -26,8 +26,8 @@ from .core import (
 
 
 def set_up(server_configurations: list[PystranoConfig]):
-    for server_config in server_configurations:
-        try:
+    try:
+        for server_config in server_configurations:
             print(f"Setting up {server_config.host}")
             c = Connection(f"root@{server_config.host}", forward_agent=True)
 
@@ -52,18 +52,18 @@ def set_up(server_configurations: list[PystranoConfig]):
             if hasattr(server_config, "service_file"):
                 print("Setting up service that should be executed")
                 setup_service(c, server_config)
-        except Exception as e:
-            print(f"Error setting up {server_config.host}: {e}")
-            continue
+    except Exception as e:
+        print(f"Error setting up: {e}")
+        exit(1)
 
 
 def deploy(server_configurations: list[PystranoConfig]):
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
 
-    for server_config in server_configurations:
-        new_release_dir = f"{server_config.releases_dir}/{timestamp}"
+    try:
+        for server_config in server_configurations:
+            new_release_dir = f"{server_config.releases_dir}/{timestamp}"
 
-        try:
             print(f"Deploying to {server_config.host}")
             c = Connection(f"{server_config.project_user}@{server_config.host}")
 
@@ -99,10 +99,9 @@ def deploy(server_configurations: list[PystranoConfig]):
 
             print("Cleaning up old releases")
             cleanup_old_releases(c, server_config)
-        except Exception as e:
-            print(f"Error deploying to {server_config.host}: {e}")
-            try_to_remove_release_dir(c, new_release_dir)
-            continue
+    except Exception as e:
+        print(f"Error deploying: {e}")
+        exit(1)
 
 
 @command()
