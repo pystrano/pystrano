@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pystrano",
-    version="0.1.0",
+    version="1.0a1",
     description="A Python package for managing deploying Django applications (like Capistrano for Ruby)",
     url="https://github.com/lexpank/pystrano",
     packages=find_packages(),

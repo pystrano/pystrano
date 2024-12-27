@@ -21,7 +21,9 @@ from .core import (
     setup_venv,
     setup_known_hosts,
     setup_service,
-    copy_env_file
+    copy_env_file,
+    copy_secrets,
+    link_secrets_to_release,
 )
 
 
@@ -29,7 +31,7 @@ def set_up(server_configurations: list[PystranoConfig]):
     try:
         for server_config in server_configurations:
             print(f"Setting up {server_config.host}")
-            c = Connection(f"root@{server_config.host}", forward_agent=True)
+            c = Connection(f"root@{server_config.host}", forward_agent=True, port=server_config.port)
 
             print("Creating project user")
             create_project_user(c, server_config)
@@ -52,6 +54,10 @@ def set_up(server_configurations: list[PystranoConfig]):
             if hasattr(server_config, "service_file"):
                 print("Setting up service that should be executed")
                 setup_service(c, server_config)
+
+            if hasattr(server_config, "secrets"):
+                print("Copying secrets to shared directory")
+                copy_secrets(c, server_config)
     except Exception as e:
         print(f"Error setting up: {e}")
         exit(1)
@@ -65,7 +71,7 @@ def deploy(server_configurations: list[PystranoConfig]):
             new_release_dir = f"{server_config.releases_dir}/{timestamp}"
 
             print(f"Deploying to {server_config.host}")
-            c = Connection(f"{server_config.project_user}@{server_config.host}", forward_agent=True)
+            c = Connection(f"{server_config.project_user}@{server_config.host}", forward_agent=True, port=server_config.port)
 
             print("Creating release directory")
             setup_release_dir(c, new_release_dir)
@@ -81,6 +87,10 @@ def deploy(server_configurations: list[PystranoConfig]):
 
             print("Installing requirements")
             install_requirements(c, new_release_dir, server_config)
+
+            if hasattr(server_config, "secrets"):
+                print("Linking secrets to the release directory")
+                link_secrets_to_release(c, new_release_dir, server_config)
 
             if hasattr(server_config, "collect_static_files") and server_config.collect_static_files:
                 print("Collecting static files")

@@ -1,5 +1,6 @@
 from fabric import Connection
 from pystrano.config import PystranoConfig
+from os import path
 
 
 def setup_release_dir(connection: Connection, new_release_dir: str):
@@ -134,3 +135,17 @@ def try_to_remove_release_dir(connection: Connection, release_dir: str):
 def copy_env_file(connection: Connection, new_release_dir: str, conf: PystranoConfig):
     """Copy the environment file to the shared directory."""
     connection.put(conf.env_file, f'{conf.shared_dir}/.env.{new_release_dir.split("/")[-1]}')
+
+
+def copy_secrets(connection: Connection, conf: PystranoConfig):
+    """Copy secrets to the shared directory."""
+    for secret in conf.secrets:
+        secret_file_name = path.basename(secret)
+        connection.put(secret, f'{conf.shared_dir}/{secret_file_name}')
+
+
+def link_secrets_to_release(connection: Connection, new_release_dir: str, conf: PystranoConfig):
+    """Link secrets to the release directory."""
+    for secret in conf.secrets:
+        secret_file_name = path.basename(secret)
+        connection.run(f'ln -sfn {conf.shared_dir}/{secret_file_name} {new_release_dir}/{secret_file_name}')

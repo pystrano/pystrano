@@ -1,0 +1,17 @@
+common: # The common configuration for all servers
+  source_code_url: 'git@gitlab.example.com:example-project/example-backend.git' # The URL of the git repository
+  project_root: 'example-backend' # The path to the root directory of the project (in the user home directory)
+  project_user: 'example-user'  # The user that will own the project
+  venv_dir: 'venv'  # The path of the virtual environment directory (in the user home directory)
+  keep_releases: 5  # The number of releases to keep
+  system_packages: 'libpq-dev python3-dev memcached libmemcached-tools libjpeg62-dev zlib1g-dev'  # The system packages to install
+  env_file: './.env.example'  # The path to the environment file (locally
+  ssh_known_hosts: 'gitlab.example.com;other.host.com' # The list of known hosts to add to the known_hosts file (separated by semicolons)
+  service_file: './deploy/api/production/gunicorn.service'  # The path to the service to set up (optional)
+  secrets: './secrets/secret-key.json'  # The path to the secrets files (optional)
+  branch: 'branch-name'  # The branch to deploy
+servers:  # The list of servers to deploy to
+  - host: '192.168.0.1'  # The IP address or host of the server
+    run_migrations: 'true'  # Whether to run migrations (set to false by default)
+    collect_static_files: 'true'  # Whether to collect static files (set to false by default)
+  - host: '192.168.0.2'

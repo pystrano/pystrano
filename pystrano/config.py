@@ -20,6 +20,10 @@ class PystranoConfig(object):
         if hasattr(self, "ssh_known_hosts") and isinstance(getattr(self, "ssh_known_hosts"), str):
             setattr(self, "ssh_known_hosts", getattr(self, "ssh_known_hosts", "").split(";"))
 
+        # Convert secrets to a list
+        if hasattr(self, "secrets") and isinstance(getattr(self, "secrets"), str):
+            setattr(self, "secrets", getattr(self, "secrets", "").split(";"))
+
     def _load_env_file(self):
         """Load the environment file and return the values as a dictionary."""
         return dotenv_values(self.env_file)
@@ -59,6 +63,11 @@ class PystranoConfig(object):
             setattr(self, "collect_static_files", self.collect_static_files.lower() == "true")
         else:
             setattr(self, "collect_static_files", False)
+
+        if hasattr(self, "port"):
+            setattr(self, "port", int(self.port))
+        else:
+            setattr(self, "port", 22)
 
 
 
