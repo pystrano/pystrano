@@ -12,7 +12,7 @@ setup(
         "pyyaml>=6.0.2",
         "python-dotenv>=1.0.1",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.10",
     entry_points={
         "console_scripts": [
             "pystrano=pystrano.deploy:main",
