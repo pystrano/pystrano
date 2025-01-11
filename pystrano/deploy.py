@@ -1,6 +1,9 @@
 from fabric import Connection
 from datetime import datetime
-from click import command, option
+from click import argument, command, option
+from os import path
+
+from pygments.lexer import default
 
 from .config import load_config, PystranoConfig
 from .core import (
@@ -113,24 +116,25 @@ def deploy(server_configurations: list[PystranoConfig]):
         print(f"Error deploying: {e}")
         exit(1)
 
-
 @command()
-@option('--config-file', required=True, help='Path to the configuration file')
-def main(config_file):
+@argument("cmd", required=True)
+@argument("environment_name", required=True)
+@argument("app_name", required=True)
+@option("--deploy-config-dir", required=False, help="Path to the deploy configuration directory. Default: ./deploy", default='./deploy')
+@option("--config-file-name", required=False, help="Name of the configuration file. Default: deployment.yml", default='deployment.yml')
+def main(cmd, environment_name, app_name, deploy_config_dir='./deploy', config_file_name='deployment.yml'):
     try:
-        server_configurations = load_config(config_file)
-        deploy(server_configurations)
+        # Load server configs for the environment
+        print(cmd, environment_name, app_name, deploy_config_dir, config_file_name)
+        server_configurations = load_config(path.join(deploy_config_dir, app_name, environment_name, config_file_name))
+
+        if cmd == "deploy":
+            deploy(server_configurations)
+        elif cmd == "setup":
+            set_up(server_configurations)
+        else:
+            print(f"Invalid command: {cmd}")
+            exit(1)
     except Exception as e:
         print(f"Error deploying servers: {e}")
-        exit(1)
-
-
-@command()
-@option('--config-file', required=True, help='Path to the configuration file')
-def setup(config_file):
-    try:
-        server_configurations = load_config(config_file)
-        set_up(server_configurations)
-    except Exception as e:
-        print(f"Error setting up servers: {e}")
         exit(1)

@@ -6,3 +6,4 @@ pystrano.egg-info
 venv
 .DS_Store
 */__pycache__
+release-script.sh
