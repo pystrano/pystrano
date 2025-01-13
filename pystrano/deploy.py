@@ -3,8 +3,6 @@ from datetime import datetime
 from click import argument, command, option
 from os import path
 
-from pygments.lexer import default
-
 from .config import load_config, PystranoConfig
 from .core import (
     setup_release_dir,
