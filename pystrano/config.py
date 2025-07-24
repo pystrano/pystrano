@@ -1,4 +1,5 @@
 from dotenv import dotenv_values
+from shlex import quote
 from yaml import safe_load
 from os import path
 
@@ -26,7 +27,9 @@ class PystranoConfig(object):
 
     def _load_env_file(self):
         """Load the environment file and return the values as a dictionary."""
-        return dotenv_values(self.env_file)
+        return {
+            k: quote(str(v)) for k, v in dotenv_values(self.env_file).items()
+        }
 
     def finalize_config(self):
         """Finalize the configuration by cleaning up the values."""
