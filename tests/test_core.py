@@ -65,13 +65,35 @@ def test_cleanup_old_releases_no_limit(fake_connection):
 
 
 def test_setup_packages(fake_connection):
-    conf = SimpleNamespace(system_packages="libpq-dev")
+    conf = SimpleNamespace(system_packages="libpq-dev\npython3-dev")
 
     core.setup_packages(fake_connection, conf)
 
     fake_connection.run.assert_any_call("apt update")
     fake_connection.run.assert_any_call("apt install -y python3 python3-venv python3-pip git")
-    fake_connection.run.assert_any_call("apt install -y libpq-dev")
+    fake_connection.run.assert_any_call("apt install -y libpq-dev python3-dev")
+
+
+def test_setup_packages_with_list(fake_connection):
+    conf = SimpleNamespace(system_packages=["libpq-dev", "python3-dev"])
+
+    core.setup_packages(fake_connection, conf)
+
+    fake_connection.run.assert_any_call("apt install -y libpq-dev python3-dev")
+
+
+def test_setup_packages_without_extra_packages(fake_connection):
+    conf = SimpleNamespace()
+
+    core.setup_packages(fake_connection, conf)
+
+    fake_connection.run.assert_has_calls(
+        [
+            call("apt update"),
+            call("apt install -y python3 python3-venv python3-pip git"),
+        ]
+    )
+    assert fake_connection.run.call_count == 2
 
 
 def test_copy_secrets(fake_connection):

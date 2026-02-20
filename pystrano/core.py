@@ -111,8 +111,16 @@ def setup_packages(connection: Connection, conf: PystranoConfig):
     connection.run("apt install -y python3 python3-venv python3-pip git")
 
     # Install additional system packages if specified
-    if conf.system_packages:
-        connection.run(f"apt install -y {conf.system_packages}")
+    system_packages = getattr(conf, "system_packages", None)
+    if system_packages:
+        if isinstance(system_packages, str):
+            system_packages = system_packages.replace(";", " ").split()
+
+        package_args = " ".join(
+            quote(str(package)) for package in system_packages if str(package).strip()
+        )
+        if package_args:
+            connection.run(f"apt install -y {package_args}")
 
 
 def setup_venv(connection: Connection, conf: PystranoConfig):

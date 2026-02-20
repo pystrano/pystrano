@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pystrano",
-    version="1.2.0",
+    version="2.0.0",
     description="A Python package for managing deploying Django applications (like Capistrano for Ruby)",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -14,7 +14,6 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.14",
     ],
@@ -26,6 +25,7 @@ setup(
         "click>=8.3.1,<9.0",
         "pyyaml>=6.0.3,<7.0",
         "python-dotenv>=1.2.1,<2.0",
+        "pydantic>=2.10,<3.0",
     ],
     entry_points={
         "console_scripts": [

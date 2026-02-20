@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pystrano"
-version = "1.2.0"
+version = "2.0.0"
 description = "A Python package for managing deploying Django applications (like Capistrano for Ruby)"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -12,7 +12,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.14",
 ]
@@ -22,6 +21,7 @@ dependencies = [
     "click>=8.3.1,<9.0",
     "pyyaml>=6.0.3,<7.0",
     "python-dotenv>=1.2.1,<2.0",
+    "pydantic>=2.10,<3.0",
 ]
 requires-python = ">=3.12"
 
@@ -68,7 +68,7 @@ issues = "https://github.com/lexpank/pystrano/issues"
 pystrano = "pystrano.deploy:main"
 
 [tool.bumpver]
-current_version = "1.2.0"
+current_version = "2.0.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "Bump version {old_version} -> {new_version}"
 commit = true
