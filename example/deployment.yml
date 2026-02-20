@@ -4,7 +4,13 @@ common: # The common configuration for all servers
   project_user: 'example-user'  # The user that will own the project
   venv_dir: 'venv'  # The path of the virtual environment directory (in the user home directory)
   keep_releases: 5  # The number of releases to keep
-  system_packages: 'libpq-dev python3-dev memcached libmemcached-tools libjpeg62-dev zlib1g-dev'  # The system packages to install
+  system_packages: |
+    libpq-dev
+    python3-dev
+    memcached
+    libmemcached-tools
+    libjpeg62-dev
+    zlib1g-dev
   env_file: './.env.example'  # The path to the environment file (locally
   ssh_known_hosts: 'gitlab.example.com;other.host.com' # The list of known hosts to add to the known_hosts file (separated by semicolons)
   service_file: './deploy/api/production/gunicorn.service'  # The path to the service to set up (optional)

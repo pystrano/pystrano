@@ -4,6 +4,10 @@ config
 dist
 pystrano.egg-info
 venv
+.venv
+.coverage
+.coverage.*
+htmlcov/
 .DS_Store
 */__pycache__
 release-script.sh
