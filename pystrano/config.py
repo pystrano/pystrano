@@ -19,12 +19,57 @@ class PystranoConfig(object):
         """Clean up the configuration values for later use."""
 
         # Convert ssh_known_hosts to a list
-        if hasattr(self, "ssh_known_hosts") and isinstance(getattr(self, "ssh_known_hosts"), str):
-            setattr(self, "ssh_known_hosts", getattr(self, "ssh_known_hosts", "").split(";"))
+        if hasattr(self, "ssh_known_hosts"):
+            ssh_known_hosts = getattr(self, "ssh_known_hosts")
+            if isinstance(ssh_known_hosts, str):
+                ssh_known_hosts = ssh_known_hosts.split(";")
+            setattr(
+                self,
+                "ssh_known_hosts",
+                [host.strip() for host in ssh_known_hosts if str(host).strip()],
+            )
 
         # Convert secrets to a list
-        if hasattr(self, "secrets") and isinstance(getattr(self, "secrets"), str):
-            setattr(self, "secrets", getattr(self, "secrets", "").split(";"))
+        if hasattr(self, "secrets"):
+            secrets = getattr(self, "secrets")
+            if isinstance(secrets, str):
+                secrets = secrets.split(";")
+            setattr(
+                self,
+                "secrets",
+                [secret.strip() for secret in secrets if str(secret).strip()],
+            )
+
+        # Support both string and list formats in config files.
+        if hasattr(self, "system_packages"):
+            system_packages = getattr(self, "system_packages")
+            if isinstance(system_packages, str):
+                system_packages = system_packages.replace(";", " ").split()
+            setattr(
+                self,
+                "system_packages",
+                [package.strip() for package in system_packages if str(package).strip()],
+            )
+
+    @staticmethod
+    def _as_bool(value, default: bool = False) -> bool:
+        """Parse booleans from YAML bools, strings, and numbers."""
+        if value is None:
+            return default
+
+        if isinstance(value, bool):
+            return value
+
+        if isinstance(value, (int, float)):
+            return bool(value)
+
+        normalized = str(value).strip().lower()
+        if normalized in {"1", "true", "yes", "on"}:
+            return True
+        if normalized in {"0", "false", "no", "off", ""}:
+            return False
+
+        raise ValueError(f"Invalid boolean value: {value!r}")
 
     def _load_env_file(self):
         """Load the environment file and return the values as a dictionary."""
@@ -56,15 +101,17 @@ class PystranoConfig(object):
         if hasattr(self, "service_file"):
             setattr(self, "service_file_name", path.basename(self.service_file))
 
-        if hasattr(self, "run_migrations"):
-            setattr(self, "run_migrations", self.run_migrations.lower() == "true")
-        else:
-            setattr(self, "run_migrations", False)
+        setattr(
+            self,
+            "run_migrations",
+            self._as_bool(getattr(self, "run_migrations", False)),
+        )
 
-        if hasattr(self, "collect_static_files"):
-            setattr(self, "collect_static_files", self.collect_static_files.lower() == "true")
-        else:
-            setattr(self, "collect_static_files", False)
+        setattr(
+            self,
+            "collect_static_files",
+            self._as_bool(getattr(self, "collect_static_files", False)),
+        )
 
         clone_depth = getattr(self, "clone_depth", 1)
         if getattr(self, "revision", None):

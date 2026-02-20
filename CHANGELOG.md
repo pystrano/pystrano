@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Python support metadata now targets `3.12+` only by removing the `3.10` classifier from packaging metadata (`pyproject.toml`, `setup.py`).
+- `system_packages` now supports both string and list config formats, with normalized parsing before install execution (`pystrano/config.py`, `pystrano/core.py`).
+
+### Fixed
+- YAML-native booleans for `run_migrations` and `collect_static_files` are now parsed safely (no string-only `.lower()` assumption) (`pystrano/config.py`).
+- Setup no longer raises an `AttributeError` when `system_packages` is omitted from configuration (`pystrano/core.py`).
 
 ## [1.2.0] - 2026-02-20
 ### Added

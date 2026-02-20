@@ -27,6 +27,7 @@ def test_load_config_normalizes_fields(tmp_path):
             "service_file": str(service_file),
             "run_migrations": "true",
             "collect_static_files": "false",
+            "system_packages": "libpq-dev\npython3-dev",
         },
         "servers": [
             {
@@ -59,6 +60,7 @@ def test_load_config_normalizes_fields(tmp_path):
     assert server.secrets[0].endswith("secret.json")
     assert server.service_file_name == Path(service_file).name
     assert server.clone_depth == 1
+    assert server.system_packages == ["libpq-dev", "python3-dev"]
 
 
 def test_finalize_config_defaults():
@@ -114,3 +116,21 @@ def test_update_dict_splits_lists():
 
     assert cfg.ssh_known_hosts == ["github.com", "gitlab.com"]
     assert cfg.secrets == ["secret.json", "path/.env"]
+
+
+def test_finalize_config_accepts_yaml_booleans():
+    cfg = PystranoConfig()
+    cfg.update_dict(
+        {
+            "project_user": "deployer",
+            "project_root": "apps/blog",
+            "venv_dir": ".venv",
+            "run_migrations": True,
+            "collect_static_files": False,
+        }
+    )
+
+    cfg.finalize_config()
+
+    assert cfg.run_migrations is True
+    assert cfg.collect_static_files is False
