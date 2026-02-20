@@ -1,6 +1,5 @@
 .idea/
 build
-config
 dist
 pystrano.egg-info
 venv
@@ -9,5 +8,5 @@ venv
 .coverage.*
 htmlcov/
 .DS_Store
-*/__pycache__
+__pycache__
 release-script.sh

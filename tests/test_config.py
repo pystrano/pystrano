@@ -159,10 +159,10 @@ def test_normalizers_handle_none_and_defaults():
 
 
 def test_rejects_invalid_list_like_field_types():
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         PystranoConfig(ssh_known_hosts=123)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         PystranoConfig(system_packages=123)
 
 
@@ -204,3 +204,82 @@ def test_finalize_config_with_absolute_paths_and_optional_fields():
 def test_load_env_file_without_env_file_returns_empty_dict():
     cfg = PystranoConfig()
     assert cfg._load_env_file() == {}
+
+
+def test_update_dict_is_atomic_on_validation_error():
+    cfg = PystranoConfig(
+        project_user="deployer",
+        project_root="apps/blog",
+        run_migrations=False,
+        system_packages=["libpq-dev"],
+    )
+
+    with pytest.raises(ValidationError):
+        cfg.update_dict(
+            {
+                "run_migrations": "true",
+                "system_packages": {"invalid": "type"},
+            }
+        )
+
+    assert cfg.run_migrations is False
+    assert cfg.system_packages == ["libpq-dev"]
+
+
+def test_finalize_config_recomputes_and_clears_derived_fields():
+    cfg = PystranoConfig(project_user="deployer", project_root="apps/blog", venv_dir=".venv")
+    cfg.finalize_config()
+    assert cfg.releases_dir == "/home/deployer/apps/blog/releases"
+    assert cfg.python_path == "/home/deployer/.venv/bin/python"
+
+    cfg.update_dict({"project_root": None, "venv_dir": None})
+    cfg.finalize_config()
+
+    assert cfg.releases_dir is None
+    assert cfg.current_dir is None
+    assert cfg.shared_dir is None
+    assert cfg.python_path is None
+
+
+def test_load_config_rejects_empty_file(tmp_path):
+    config_path = tmp_path / "deployment.yml"
+    config_path.write_text("")
+
+    with pytest.raises(ValueError, match="is empty"):
+        config.load_config(str(config_path))
+
+
+def test_load_config_rejects_missing_common_section(tmp_path):
+    config_path = tmp_path / "deployment.yml"
+    config_path.write_text(yaml.safe_dump({"servers": [{"host": "example.com"}]}))
+
+    with pytest.raises(ValueError, match="common"):
+        config.load_config(str(config_path))
+
+
+def test_load_config_rejects_empty_servers_list(tmp_path):
+    config_path = tmp_path / "deployment.yml"
+    config_path.write_text(yaml.safe_dump({"common": {}, "servers": []}))
+
+    with pytest.raises(ValueError, match="must not be empty"):
+        config.load_config(str(config_path))
+
+
+def test_load_config_rejects_unknown_server_keys(tmp_path):
+    config_path = tmp_path / "deployment.yml"
+    config_path.write_text(
+        yaml.safe_dump(
+            {
+                "common": {},
+                "servers": [
+                    {
+                        "host": "example.com",
+                        "unknown_option": "oops",
+                    }
+                ],
+            }
+        )
+    )
+
+    with pytest.raises(ValueError, match="unknown_option"):
+        config.load_config(str(config_path))
