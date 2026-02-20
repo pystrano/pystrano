@@ -1,5 +1,7 @@
 # Pystrano
 
+---
+
 [![Tests](https://github.com/pystrano/pystrano/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/pystrano/pystrano/actions/workflows/tests.yml)
 
 Pystrano is a simple deployment tool for Python projects.
@@ -19,9 +21,12 @@ in any capacity, don't hesitate.
 pip install pystrano
 ```
 
+Requires Python `3.12+`.
+
 ### Configuration
 
-Pystrano uses a YAML file to configure the deployment. It contains two sections: `common` and `servers`. Variables in `common` section are shared across all servers, while in `servers` section you define a list of servers to deploy to. It is also possible to define server-specific variables, which will override the common ones (if defined).
+Pystrano uses a YAML file with two top-level sections: `common` and `servers`.
+Values in `common` are shared defaults. Values in each `servers` item override `common`.
 
 Here is a description of variables you can set in the config file:
 
@@ -30,11 +35,11 @@ Here is a description of variables you can set in the config file:
 - `project_user`: The user that will be used to deploy the project;
 - `venv_dir`: The directory where the virtual environment is located (in the `project_user` home);
 - `keep_releases`: The number of releases to keep on the server. If set to 0 or less, all releases will be kept;
-- `system_packages`: A list of system packages to install on the server (during setup);
+- `system_packages`: System packages to install during setup. Accepts YAML list, whitespace-separated string, or semicolon-separated string;
 - `env_file`: The path to the environment file to use for the deployment;
-- `ssh_known_hosts`: The path to the known hosts file to use for the deployment  (during setup; separated by semicolons);
+- `ssh_known_hosts`: List of hostnames to add via `ssh-keyscan` during setup (semicolon-separated string or YAML list);
 - `service_file`: The path to the service file to set up/use in deployment (optional);
-- `secrets`: List of secrets to set up on the server (during setup only for now; separated by semicolons);
+- `secrets`: List of secret file paths to copy during setup (semicolon-separated string or YAML list);
 - `branch`: The name of the branch to deploy.
 - `clone_depth`: Depth to use for the shallow clone (default 1; set to 0 for a full clone).
 - `revision`: Optional git revision (tag, SHA, or ref) to check out after cloning.
@@ -43,8 +48,14 @@ Server-specific variables:
 
 - `host`: The hostname of the server;
 - `port`: The port to use for SSH connection (optional, default is 22);
-- `run_migrations`: Whether to run migrations on deployment (optional, default is false);
-- `collect_static_files`: Whether to collect static files on deployment (optional, default is false);
+- `run_migrations`: Whether to run migrations on deployment (optional, default is false; use YAML booleans `true`/`false`);
+- `collect_static_files`: Whether to collect static files on deployment (optional, default is false; use YAML booleans `true`/`false`);
+
+Validation rules:
+
+- `common` is required;
+- `servers` is required and must be non-empty;
+- unknown keys are rejected (strict validation), so typos fail fast.
 
 Default directory structure for the configs is as follows:
 
@@ -59,10 +70,10 @@ deploy/
 
 Pystrano is a command line tool. To deploy a project, you need
 to create a config for the environment you want to deploy to.
-General  syntax for usage is as follows:
+General syntax for usage is as follows:
 
 ```bash
-pystrano <command> <environment> <project>
+pystrano <command> <environment> <app>
 ```
 
 Available commands are:
@@ -91,4 +102,10 @@ To deploy your project, run the following command:
 
 ```bash
 pystrano deploy production api
+```
+
+To preview what will run without making remote changes:
+
+```bash
+pystrano deploy production api --dry-run --verbose
 ```
