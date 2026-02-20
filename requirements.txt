@@ -12,7 +12,7 @@ cffi==1.17.1
     #   pynacl
 click==8.3.1
     # via pystrano (pyproject.toml)
-cryptography==46.0.0
+cryptography==46.0.5
     # via paramiko
 decorator==5.1.1
     # via fabric
