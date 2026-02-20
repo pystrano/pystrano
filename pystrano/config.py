@@ -6,6 +6,7 @@ from os import path
 
 class PystranoConfig(object):
     """A class to represent a Pystrano server configuration."""
+
     def __init__(self):
         self._config_finalized = False
 
@@ -27,9 +28,7 @@ class PystranoConfig(object):
 
     def _load_env_file(self):
         """Load the environment file and return the values as a dictionary."""
-        return {
-            k: quote(str(v)) for k, v in dotenv_values(self.env_file).items()
-        }
+        return {k: quote(str(v)) for k, v in dotenv_values(self.env_file).items()}
 
     def finalize_config(self):
         """Finalize the configuration by cleaning up the values."""
@@ -67,15 +66,27 @@ class PystranoConfig(object):
         else:
             setattr(self, "collect_static_files", False)
 
+        clone_depth = getattr(self, "clone_depth", 1)
+        if getattr(self, "revision", None):
+            clone_depth = None
+        else:
+            try:
+                clone_depth = int(clone_depth)
+            except (TypeError, ValueError):
+                clone_depth = None
+            else:
+                if clone_depth <= 0:
+                    clone_depth = None
+        setattr(self, "clone_depth", clone_depth)
+
         if hasattr(self, "port"):
             setattr(self, "port", int(self.port))
         else:
             setattr(self, "port", 22)
 
 
-
 def create_server_config(server_description: dict, common_config: dict) -> PystranoConfig:
-    """Create a Pystrano server configuration from the given server description and common configuration."""
+    """Build a Pystrano config from shared defaults and server overrides."""
     config = PystranoConfig()
 
     # Load common variables first
@@ -88,6 +99,7 @@ def create_server_config(server_description: dict, common_config: dict) -> Pystr
     config.finalize_config()
 
     return config
+
 
 def load_config(config_path: str) -> list[PystranoConfig]:
     """Load Pystrano server configurations from the given YAML config file."""

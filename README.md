@@ -34,13 +34,15 @@ Here is a description of variables you can set in the config file:
 - `service_file`: The path to the service file to set up/use in deployment (optional);
 - `secrets`: List of secrets to set up on the server (during setup only for now; separated by semicolons);
 - `branch`: The name of the branch to deploy.
+- `clone_depth`: Depth to use for the shallow clone (default 1; set to 0 for a full clone).
+- `revision`: Optional git revision (tag, SHA, or ref) to check out after cloning.
 
 Server-specific variables:
 
 - `host`: The hostname of the server;
 - `port`: The port to use for SSH connection (optional, default is 22);
 - `run_migrations`: Whether to run migrations on deployment (optional, default is false);
-- `run_collectstatic`: Whether to run collectstatic on deployment (optional, default is false);
+- `collect_static_files`: Whether to collect static files on deployment (optional, default is false);
 
 Default directory structure for the configs is as follows:
 
@@ -70,6 +72,8 @@ Optional arguments:
 
 - `--deploy-config-dir`: The directory where the deployment configs are located (default is `deploy`);
 - `--config-file-name`: The name of the config file to use (default is `deployment.yml`);
+- `--verbose`: Enable verbose logging output;
+- `--dry-run`: Print all commands without executing them.
 
 ### Example usage
 
