@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ### Changed
 - Python support metadata now targets `3.12+` only by removing the `3.10` classifier from packaging metadata (`pyproject.toml`, `setup.py`).
 - `system_packages` now supports both string and list config formats, with normalized parsing before install execution (`pystrano/config.py`, `pystrano/core.py`).
+- Introduced a pydantic-backed `PystranoConfig` model with typed fields and validation for booleans, list-like values, ports, and clone-depth behavior (`pystrano/config.py`).
 
 ### Fixed
 - YAML-native booleans for `run_migrations` and `collect_static_files` are now parsed safely (no string-only `.lower()` assumption) (`pystrano/config.py`).

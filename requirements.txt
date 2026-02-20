@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=requirements.txt pyproject.toml
 #
+annotated-types==0.7.0
+    # via pydantic
 bcrypt==5.0.0
     # via paramiko
 cffi==2.0.0
@@ -28,11 +30,22 @@ paramiko==4.0.0
     # via fabric
 pycparser==3.0
     # via cffi
+pydantic==2.12.5
+    # via pystrano (pyproject.toml)
+pydantic-core==2.41.5
+    # via pydantic
 pynacl==1.6.2
     # via paramiko
 python-dotenv==1.2.1
     # via pystrano (pyproject.toml)
 pyyaml==6.0.3
     # via pystrano (pyproject.toml)
+typing-extensions==4.15.0
+    # via
+    #   pydantic
+    #   pydantic-core
+    #   typing-inspection
+typing-inspection==0.4.2
+    # via pydantic
 wrapt==2.1.1
     # via deprecated

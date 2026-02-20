@@ -27,4 +27,4 @@ jobs:
           python -m pip install -e ".[test]"
 
       - name: Run tests
-        run: pytest -q --cov=pystrano --cov-report=term-missing --cov-fail-under=85
+        run: pytest -q --cov=pystrano --cov-report=term-missing --cov-fail-under=90

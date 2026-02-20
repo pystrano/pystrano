@@ -25,6 +25,7 @@ setup(
         "click>=8.3.1,<9.0",
         "pyyaml>=6.0.3,<7.0",
         "python-dotenv>=1.2.1,<2.0",
+        "pydantic>=2.10,<3.0",
     ],
     entry_points={
         "console_scripts": [

@@ -1,6 +1,8 @@
 from pathlib import Path
 
+import pytest
 import yaml
+from pydantic import ValidationError
 
 from pystrano import config
 from pystrano.config import PystranoConfig
@@ -134,3 +136,71 @@ def test_finalize_config_accepts_yaml_booleans():
 
     assert cfg.run_migrations is True
     assert cfg.collect_static_files is False
+
+
+def test_normalizers_handle_none_and_defaults():
+    cfg = PystranoConfig(
+        ssh_known_hosts=None,
+        secrets=None,
+        system_packages=None,
+        run_migrations=None,
+        collect_static_files=None,
+        port=None,
+        clone_depth=None,
+    )
+
+    assert cfg.ssh_known_hosts == []
+    assert cfg.secrets == []
+    assert cfg.system_packages == []
+    assert cfg.run_migrations is False
+    assert cfg.collect_static_files is False
+    assert cfg.port == 22
+    assert cfg.clone_depth == 1
+
+
+def test_rejects_invalid_list_like_field_types():
+    with pytest.raises(TypeError):
+        PystranoConfig(ssh_known_hosts=123)
+
+    with pytest.raises(TypeError):
+        PystranoConfig(system_packages=123)
+
+
+def test_bool_parsing_accepts_numbers_and_rejects_invalid_strings():
+    assert PystranoConfig(run_migrations=1).run_migrations is True
+    assert PystranoConfig(collect_static_files=0).collect_static_files is False
+
+    with pytest.raises(ValidationError):
+        PystranoConfig(run_migrations="sometimes")
+
+
+def test_clone_depth_parsing_cases():
+    assert PystranoConfig(clone_depth="abc").clone_depth is None
+    assert PystranoConfig(clone_depth=0).clone_depth is None
+    assert PystranoConfig(clone_depth=2).clone_depth == 2
+    assert PystranoConfig(clone_depth=2, revision="v1.0.0").clone_depth is None
+
+
+def test_finalize_config_with_absolute_paths_and_optional_fields():
+    cfg = PystranoConfig(project_user="deployer", project_root="/srv/app", venv_dir="/opt/venv")
+    cfg.finalize_config()
+
+    assert cfg.project_root == "/srv/app"
+    assert cfg.releases_dir == "/srv/app/releases"
+    assert cfg.current_dir == "/srv/app/current"
+    assert cfg.shared_dir == "/srv/app/shared"
+    assert cfg.venv_dir == "/opt/venv"
+    assert cfg.python_path == "/opt/venv/bin/python"
+
+    empty = PystranoConfig()
+    empty.finalize_config()
+    assert empty.releases_dir is None
+    assert empty.current_dir is None
+    assert empty.shared_dir is None
+    assert empty.python_path is None
+    assert empty.service_file_name is None
+
+
+def test_load_env_file_without_env_file_returns_empty_dict():
+    cfg = PystranoConfig()
+    assert cfg._load_env_file() == {}
