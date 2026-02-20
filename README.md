@@ -1,5 +1,7 @@
 # Pystrano
 
+[![Tests](https://github.com/pystrano/pystrano/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/pystrano/pystrano/actions/workflows/tests.yml)
+
 Pystrano is a simple deployment tool for Python projects.
 It is inspired by Capistrano, a popular deployment tool for
 Ruby projects.
