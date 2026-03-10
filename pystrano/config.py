@@ -56,12 +56,12 @@ class PystranoConfig(object):
         if hasattr(self, "service_file"):
             setattr(self, "service_file_name", path.basename(self.service_file))
 
-        if hasattr(self, "run_migrations"):
+        if hasattr(self, "run_migrations") and type(self.run_migrations) == str:
             setattr(self, "run_migrations", self.run_migrations.lower() == "true")
         else:
             setattr(self, "run_migrations", False)
 
-        if hasattr(self, "collect_static_files"):
+        if hasattr(self, "collect_static_files") and type(self.collect_static_files) == str:
             setattr(self, "collect_static_files", self.collect_static_files.lower() == "true")
         else:
             setattr(self, "collect_static_files", False)
