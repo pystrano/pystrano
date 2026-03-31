@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-03-31
+### Fixed
+- Accept native YAML boolean values for `run_migrations` and `collect_static_files` instead of assuming those settings are always strings, preventing config finalization failures (`pystrano/config.py`, `tests/test_config.py`).
+
 ## [1.2.0] - 2026-02-20
 ### Added
 - Support for shallow git clones with configurable `clone_depth` and optional `revision` pins during deployments (`pystrano/core.py`).

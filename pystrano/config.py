@@ -30,6 +30,15 @@ class PystranoConfig(object):
         """Load the environment file and return the values as a dictionary."""
         return {k: quote(str(v)) for k, v in dotenv_values(self.env_file).items()}
 
+    @staticmethod
+    def _to_bool(value):
+        """Normalize config booleans from YAML/native values."""
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower() == "true"
+        return bool(value)
+
     def finalize_config(self):
         """Finalize the configuration by cleaning up the values."""
         if self._config_finalized:
@@ -57,12 +66,12 @@ class PystranoConfig(object):
             setattr(self, "service_file_name", path.basename(self.service_file))
 
         if hasattr(self, "run_migrations"):
-            setattr(self, "run_migrations", self.run_migrations.lower() == "true")
+            setattr(self, "run_migrations", self._to_bool(self.run_migrations))
         else:
             setattr(self, "run_migrations", False)
 
         if hasattr(self, "collect_static_files"):
-            setattr(self, "collect_static_files", self.collect_static_files.lower() == "true")
+            setattr(self, "collect_static_files", self._to_bool(self.collect_static_files))
         else:
             setattr(self, "collect_static_files", False)
 

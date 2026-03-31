@@ -87,6 +87,23 @@ def test_finalize_config_defaults():
     assert cfg.clone_depth == 1
 
 
+def test_finalize_config_accepts_native_boolean_flags():
+    cfg = PystranoConfig()
+    cfg.update_dict(
+        {
+            "project_user": "deployer",
+            "project_root": "apps/blog",
+            "run_migrations": True,
+            "collect_static_files": False,
+        }
+    )
+
+    cfg.finalize_config()
+
+    assert cfg.run_migrations is True
+    assert cfg.collect_static_files is False
+
+
 def test_revision_disables_shallow_clone():
     cfg = PystranoConfig()
     cfg.update_dict(
