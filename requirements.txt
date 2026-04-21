@@ -30,7 +30,7 @@ pycparser==3.0
     # via cffi
 pynacl==1.6.2
     # via paramiko
-python-dotenv==1.2.1
+python-dotenv==1.2.2
     # via pystrano (pyproject.toml)
 pyyaml==6.0.3
     # via pystrano (pyproject.toml)
