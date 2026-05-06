@@ -6,13 +6,6 @@ Pystrano is a simple deployment tool for Python projects.
 It is inspired by Capistrano, a popular deployment tool for
 Ruby projects.
 
-## Disclaimer
-
-This is a work in progress. It is not ready for production use
-just yet. Proceed with caution. Currently used with Ubuntu
-by yours truly. If someone finds it useful and wants to use it
-in any capacity, don't hesitate.
-
 ## Installation
 
 ```bash
