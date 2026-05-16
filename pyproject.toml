@@ -5,18 +5,32 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pystrano"
 version = "1.2.1"
-description = "A Python package for managing deploying Django applications (like Capistrano for Ruby)"
+description = "Capistrano-inspired deployment automation for Django apps."
 readme = "README.md"
 license = { file = "LICENSE" }
 classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: System :: Systems Administration",
 ]
-keywords = ["pystrano"]
+keywords = [
+    "pystrano",
+    "deployment",
+    "deploy",
+    "django",
+    "cli",
+    "yaml",
+    "capistrano",
+    "ssh",
+    "gunicorn",
+    "systemd",
+]
 dependencies = [
     "fabric>=3.2.2,<4.0",
     "click>=8.3.1,<9.0",
@@ -61,8 +75,10 @@ skip-magic-trailing-comma = false
 line-ending = "lf"
 
 [project.urls]
-homepage = "https://github.com/lexpank/pystrano"
-issues = "https://github.com/lexpank/pystrano/issues"
+Homepage = "https://pystrano.com"
+Documentation = "https://pystrano.com/docs"
+Source = "https://github.com/pystrano/pystrano"
+Issues = "https://github.com/pystrano/pystrano/issues"
 
 [project.scripts]
 pystrano = "pystrano.deploy:main"
