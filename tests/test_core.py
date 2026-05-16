@@ -84,20 +84,23 @@ def test_copy_secrets(fake_connection):
 
 
 def test_update_source_code(fake_connection):
+    release_dir = "/srv/app/releases/20240101"
     conf = SimpleNamespace(
         source_code_url="git@github.com:example/repo.git",
         branch="main",
         clone_depth=1,
     )
 
-    core.update_source_code(fake_connection, "/srv/app/releases/20240101", conf)
+    core.update_source_code(fake_connection, release_dir, conf)
 
     fake_connection.run.assert_called_once_with(
-        "git clone --single-branch --depth 1 --branch main git@github.com:example/repo.git /srv/app/releases/20240101"
+        "git clone --single-branch --depth 1 --branch main "
+        f"git@github.com:example/repo.git {release_dir}"
     )
 
 
 def test_update_source_code_with_revision(fake_connection):
+    release_dir = "/srv/app/releases/20240101"
     conf = SimpleNamespace(
         source_code_url="git@github.com:example/repo.git",
         branch="main",
@@ -105,12 +108,12 @@ def test_update_source_code_with_revision(fake_connection):
         clone_depth=None,
     )
 
-    core.update_source_code(fake_connection, "/srv/app/releases/20240101", conf)
+    core.update_source_code(fake_connection, release_dir, conf)
 
-    fake_connection.cd.assert_called_once_with("/srv/app/releases/20240101")
+    fake_connection.cd.assert_called_once_with(release_dir)
     assert fake_connection.run.call_args_list == [
         call(
-            "git clone --single-branch --branch main git@github.com:example/repo.git /srv/app/releases/20240101"
+            f"git clone --single-branch --branch main git@github.com:example/repo.git {release_dir}"
         ),
         call("git fetch --tags --force"),
         call("git checkout v1.2.3"),

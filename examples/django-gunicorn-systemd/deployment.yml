@@ -1,0 +1,22 @@
+common:
+  source_code_url: "git@github.com:example/example-django-app.git"
+  project_root: "apps/example-django-app"
+  project_user: "deploy"
+  venv_dir: ".venv"
+  keep_releases: 5
+  system_packages: |
+    libpq-dev
+    python3-dev
+    build-essential
+  env_file: "./deploy/example_django_app/production/.env"
+  ssh_known_hosts: "github.com"
+  service_file: "./deploy/example_django_app/production/gunicorn.service"
+  secrets: "./deploy/example_django_app/production/django-secret-key.txt"
+  branch: "main"
+  clone_depth: 1
+
+servers:
+  - host: "app1.example.com"
+    port: 22
+    run_migrations: true
+    collect_static_files: true

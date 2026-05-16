@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Clarified Pystrano's current scope as Django-first deployment automation.
+- Added roadmap wording for planned FastAPI support.
+- Removed or softened wording that implied current FastAPI or framework-agnostic support.
+- Improved README and onboarding documentation.
+- Added a Django, Gunicorn, and systemd deployment example.
+- Clarified project positioning and usage guidance.
+- Removed the obsolete singular `example/` manifest in favor of `examples/`.
 
 ## [1.2.1] - 2026-03-31
 ### Fixed
