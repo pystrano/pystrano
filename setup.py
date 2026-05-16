@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pystrano",
-    version="1.2.1",
+    version="1.2.2",
     description="Capistrano-inspired deployment automation for Django apps.",
     long_description=long_description,
     long_description_content_type="text/markdown",

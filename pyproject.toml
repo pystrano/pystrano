@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pystrano"
-version = "1.2.1"
+version = "1.2.2"
 description = "Capistrano-inspired deployment automation for Django apps."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -84,7 +84,7 @@ Issues = "https://github.com/pystrano/pystrano/issues"
 pystrano = "pystrano.deploy:main"
 
 [tool.bumpver]
-current_version = "1.2.1"
+current_version = "1.2.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "Bump version {old_version} -> {new_version}"
 commit = true
