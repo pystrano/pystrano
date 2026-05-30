@@ -12,8 +12,6 @@ from .core import (
     update_source_code,
     setup_symlinks,
     install_requirements,
-    collect_static_files,
-    migrate_database,
     update_symlink,
     restart_service,
     cleanup_old_releases,
@@ -28,6 +26,7 @@ from .core import (
     copy_secrets,
     link_secrets_to_release,
 )
+from .workflows import get_workflow
 
 
 class DryRunConnection:
@@ -218,25 +217,9 @@ def deploy(
                 link_secrets_to_release(connection, new_release_dir, server_config)
                 _step("Linked secrets into release")
 
-            ran_static = (
-                hasattr(server_config, "collect_static_files")
-                and server_config.collect_static_files
-            )
-            if ran_static:
-                collect_static_files(connection, new_release_dir, server_config)
-
-            ran_migrations = (
-                hasattr(server_config, "run_migrations") and server_config.run_migrations
-            )
-            if ran_migrations:
-                migrate_database(connection, new_release_dir, server_config)
-
-            if ran_static and ran_migrations:
-                _step("Applied migrations and refreshed static assets")
-            elif ran_static:
-                _step("Refreshed static assets")
-            elif ran_migrations:
-                _step("Applied database migrations")
+            workflow = get_workflow(getattr(server_config, "framework", "django"))
+            for message in workflow.run_release_steps(connection, new_release_dir, server_config):
+                _step(message)
 
             update_symlink(connection, new_release_dir, server_config)
             _step("Promoted release to current")

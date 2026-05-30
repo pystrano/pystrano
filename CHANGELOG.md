@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-05-30
+### Added
+- Added framework-specific deployment workflows with `framework: django` and `framework: fastapi`.
+- Added FastAPI deployment support with default Alembic migrations and configurable `migration_command`.
+- Added configurable FastAPI static asset command support through `static_files_command`.
+- Added a FastAPI, Uvicorn, and systemd deployment example.
+
+### Changed
+- Split Django-specific `manage.py` deployment steps from the shared setup and deploy pipeline.
+- Updated project metadata and documentation to describe Django and FastAPI support.
+
 ## [1.2.2] - 2026-05-17
 ### Changed
 - Clarified Pystrano's current scope as Django-first deployment automation.

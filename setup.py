@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pystrano",
-    version="1.2.2",
-    description="Capistrano-inspired deployment automation for Django apps.",
+    version="2.0.0",
+    description="Capistrano-inspired deployment automation for Django and FastAPI apps.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",
@@ -26,6 +26,7 @@ setup(
         "deployment",
         "deploy",
         "django",
+        "fastapi",
         "cli",
         "yaml",
         "capistrano",
@@ -36,10 +37,10 @@ setup(
     packages=find_packages(),
     python_requires=">=3.12",
     install_requires=[
-        "fabric>=3.2.2,<4.0",
-        "click>=8.3.1,<9.0",
+        "fabric>=3.2.3,<4.0",
+        "click>=8.4.1,<9.0",
         "pyyaml>=6.0.3,<7.0",
-        "python-dotenv>=1.2.1,<2.0",
+        "python-dotenv>=1.2.2,<2.0",
     ],
     entry_points={
         "console_scripts": [

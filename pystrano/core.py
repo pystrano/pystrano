@@ -58,6 +58,17 @@ def migrate_database(connection: Connection, new_release_dir: str, conf: Pystran
         connection.run(f"{conf.python_path} manage.py migrate", env=conf.env_vars)
 
 
+def run_release_command(
+    connection: Connection,
+    new_release_dir: str,
+    conf: PystranoConfig,
+    command: str,
+):
+    """Run a configured command from a release directory."""
+    with connection.cd(new_release_dir):
+        connection.run(command, env=getattr(conf, "env_vars", {}))
+
+
 def update_symlink(connection: Connection, new_release_dir: str, conf: PystranoConfig):
     """Update the `current` symlink to point to the new release."""
     connection.run(f"ln -sfn {new_release_dir} {conf.current_dir}")

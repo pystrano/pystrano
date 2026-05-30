@@ -62,6 +62,12 @@ class PystranoConfig(object):
         if hasattr(self, "env_file"):
             setattr(self, "env_vars", self._load_env_file())
 
+        framework = getattr(self, "framework", "django")
+        framework = str(framework).strip().lower().replace("-", "").replace("_", "")
+        if framework not in {"django", "fastapi"}:
+            raise ValueError(f"Unsupported framework: {framework}")
+        setattr(self, "framework", framework)
+
         if hasattr(self, "service_file"):
             setattr(self, "service_file_name", path.basename(self.service_file))
 
