@@ -1,9 +1,9 @@
 # Pystrano
 
-Capistrano-inspired deployment automation for Django apps.
+Capistrano-inspired deployment automation for Django and FastAPI apps.
 
-Pystrano helps you define repeatable SSH-based Django deployment workflows with
-simple YAML playbooks.
+Pystrano helps you define repeatable SSH-based Python web deployment workflows
+with simple YAML playbooks.
 
 - Website: https://pystrano.com
 - Documentation: https://pystrano.com/docs
@@ -12,11 +12,7 @@ simple YAML playbooks.
 
 ## Project Status
 
-Pystrano is currently focused on Django deployment workflows. Django is the
-tested and documented path today.
-
-FastAPI support is planned, but it should be treated as roadmap work until the
-implementation, tests, and documentation are released.
+Pystrano currently supports Django and FastAPI deployment workflows.
 
 Other Python applications may be possible through custom commands, but they are
 not the primary supported workflow yet.
@@ -25,14 +21,14 @@ not the primary supported workflow yet.
 
 Use Pystrano if:
 
-- you deploy Django apps to one or more servers over SSH
+- you deploy Django or FastAPI apps to one or more servers over SSH
 - you want repeatable deployment workflows
 - you prefer simple YAML playbooks
 - you want release-oriented deploys and rollback-friendly structure
 - you are deploying to VPS-style servers with tools like Gunicorn and systemd
 
 Pystrano may be adaptable to other Python applications through custom commands,
-but Django is the supported and documented workflow today.
+but Django and FastAPI are the supported and documented workflows today.
 
 Consider other tools if:
 
@@ -100,6 +96,7 @@ the common values for that server.
 ```yaml
 common:
   source_code_url: "git@github.com:example/example-django-app.git"
+  framework: "django"
   project_root: "apps/example-django-app"
   project_user: "deploy"
   venv_dir: ".venv"
@@ -128,6 +125,7 @@ servers:
 Common fields used by the current implementation:
 
 - `source_code_url`: Git repository URL cloned on each deploy.
+- `framework`: Deployment workflow. Supported values are `django` and `fastapi`. Defaults to `django`.
 - `project_root`: Project directory under `/home/<project_user>/`.
 - `project_user`: Remote user that owns and deploys the app.
 - `venv_dir`: Virtualenv directory under `/home/<project_user>/`.
@@ -140,13 +138,15 @@ Common fields used by the current implementation:
 - `branch`: Git branch cloned during deploy.
 - `clone_depth`: Shallow clone depth. Use `0` or less for a full clone.
 - `revision`: Optional tag, SHA, or ref checked out after cloning. When set, Pystrano performs a full clone.
+- `migration_command`: FastAPI migration command. Defaults to `<venv_dir>/bin/alembic upgrade head`.
+- `static_files_command`: FastAPI static files command. Required when `framework: fastapi` and `collect_static_files: true`.
 
 Server fields:
 
 - `host`: SSH host.
 - `port`: SSH port. Defaults to `22`.
-- `run_migrations`: Whether to run `manage.py migrate` during deploy.
-- `collect_static_files`: Whether to run `manage.py collectstatic --noinput` during deploy.
+- `run_migrations`: Whether to run the framework migration step during deploy.
+- `collect_static_files`: Whether to run the framework static files step during deploy.
 
 ## Deployment Workflow
 
@@ -165,9 +165,26 @@ timestamped release under:
 
 The deploy flow clones the configured repository, copies the dotenv file into
 the shared directory, links shared assets, installs `requirements.txt`, links
-configured secrets, optionally runs Django static collection and migrations,
-updates the `current` symlink, optionally restarts the configured systemd
-service, and removes old releases according to `keep_releases`.
+configured secrets, optionally runs framework-specific static collection and
+migrations, updates the `current` symlink, optionally restarts the configured
+systemd service, and removes old releases according to `keep_releases`.
+
+For Django, the framework steps are:
+
+```text
+<python_path> manage.py collectstatic --noinput
+<python_path> manage.py migrate
+```
+
+For FastAPI, migrations default to:
+
+```text
+<venv_dir>/bin/alembic upgrade head
+```
+
+Set `migration_command` to override the FastAPI migration command. Set
+`static_files_command` when a FastAPI deployment needs a custom static asset
+build step.
 
 Pystrano does not currently expose a `rollback` CLI command. Deployments are
 release-oriented, so a maintainer can inspect previous release directories on
@@ -180,10 +197,16 @@ See [examples/django-gunicorn-systemd](examples/django-gunicorn-systemd/) for a
 starting point that combines Django, Gunicorn, systemd, SSH deployment, shared
 files, and release cleanup.
 
+## Example: FastAPI on a VPS
+
+See [examples/fastapi-uvicorn-systemd](examples/fastapi-uvicorn-systemd/) for a
+starting point that combines FastAPI, Uvicorn, systemd, SSH deployment, Alembic
+migrations, shared files, and release cleanup.
+
 ## Maintainer Checklist
 
 Recommended GitHub repository metadata:
 
-- Repository description: `Capistrano-inspired deployment automation for Django apps.`
+- Repository description: `Capistrano-inspired deployment automation for Django and FastAPI apps.`
 - Website: `https://pystrano.com`
-- Topics: `python`, `django`, `deployment`, `deploy`, `cli`, `yaml`, `capistrano`, `devops`, `ssh`, `systemd`, `gunicorn`, `vps`
+- Topics: `python`, `django`, `fastapi`, `deployment`, `deploy`, `cli`, `yaml`, `capistrano`, `devops`, `ssh`, `systemd`, `gunicorn`, `uvicorn`, `vps`

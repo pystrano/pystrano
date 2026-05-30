@@ -1,0 +1,24 @@
+common:
+  source_code_url: "git@github.com:example/example-fastapi-app.git"
+  framework: "fastapi"
+  project_root: "apps/example-fastapi-app"
+  project_user: "deploy"
+  venv_dir: ".venv"
+  keep_releases: 5
+  system_packages: |
+    libpq-dev
+    python3-dev
+    build-essential
+  env_file: "./deploy/example_fastapi_app/production/.env"
+  ssh_known_hosts: "github.com"
+  service_file: "./deploy/example_fastapi_app/production/uvicorn.service"
+  secrets: "./deploy/example_fastapi_app/production/app-secret.txt"
+  branch: "main"
+  clone_depth: 1
+  migration_command: "/home/deploy/.venv/bin/alembic upgrade head"
+
+servers:
+  - host: "app1.example.com"
+    port: 22
+    run_migrations: true
+    collect_static_files: false

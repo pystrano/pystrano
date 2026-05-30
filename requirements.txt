@@ -10,21 +10,21 @@ cffi==2.0.0
     # via
     #   cryptography
     #   pynacl
-click==8.3.1
+click==8.4.1
     # via pystrano (pyproject.toml)
-cryptography==46.0.7
+cryptography==48.0.0
     # via paramiko
-decorator==5.2.1
+decorator==5.3.1
     # via fabric
 deprecated==1.3.1
     # via fabric
-fabric==3.2.2
+fabric==3.2.3
     # via pystrano (pyproject.toml)
 invoke==2.2.1
     # via
     #   fabric
     #   paramiko
-paramiko==4.0.0
+paramiko==5.0.0
     # via fabric
 pycparser==3.0
     # via cffi
@@ -34,5 +34,5 @@ python-dotenv==1.2.2
     # via pystrano (pyproject.toml)
 pyyaml==6.0.3
     # via pystrano (pyproject.toml)
-wrapt==2.1.1
+wrapt==2.2.1
     # via deprecated

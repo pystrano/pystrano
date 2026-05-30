@@ -1,5 +1,6 @@
 common:
   source_code_url: "git@github.com:example/example-django-app.git"
+  framework: "django"
   project_root: "apps/example-django-app"
   project_user: "deploy"
   venv_dir: ".venv"

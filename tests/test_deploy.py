@@ -204,9 +204,13 @@ def test_deploy_executes_full_flow(mocker):
         service_file="/etc/systemd/system/gunicorn.service",
         service_file_name="gunicorn.service",
         branch="main",
+        framework="django",
     )
     connection = mocker.Mock()
     make_connection = mocker.patch("pystrano.deploy._make_connection", return_value=connection)
+    workflow = mocker.Mock()
+    workflow.run_release_steps.return_value = ["Ran framework steps"]
+    get_workflow = mocker.patch("pystrano.deploy.get_workflow", return_value=workflow)
     datetime_mock = mocker.patch("pystrano.deploy.datetime")
     datetime_mock.now.return_value.strftime.return_value = "20240101010101"
 
@@ -219,8 +223,6 @@ def test_deploy_executes_full_flow(mocker):
             "setup_symlinks",
             "install_requirements",
             "link_secrets_to_release",
-            "collect_static_files",
-            "migrate_database",
             "update_symlink",
             "restart_service",
             "cleanup_old_releases",
@@ -259,16 +261,8 @@ def test_deploy_executes_full_flow(mocker):
         new_release_dir,
         server_config,
     )
-    helpers["collect_static_files"].assert_called_once_with(
-        connection,
-        new_release_dir,
-        server_config,
-    )
-    helpers["migrate_database"].assert_called_once_with(
-        connection,
-        new_release_dir,
-        server_config,
-    )
+    get_workflow.assert_called_once_with("django")
+    workflow.run_release_steps.assert_called_once_with(connection, new_release_dir, server_config)
     helpers["update_symlink"].assert_called_once_with(
         connection,
         new_release_dir,

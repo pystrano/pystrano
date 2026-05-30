@@ -39,6 +39,19 @@ def test_collect_static_files(fake_connection):
     )
 
 
+def test_run_release_command(fake_connection):
+    release_dir = "/srv/app/releases/20240101"
+    conf = SimpleNamespace(env_vars={"APP_ENV": "production"})
+
+    core.run_release_command(fake_connection, release_dir, conf, "alembic upgrade head")
+
+    fake_connection.cd.assert_called_once_with(release_dir)
+    fake_connection.run.assert_called_once_with(
+        "alembic upgrade head",
+        env={"APP_ENV": "production"},
+    )
+
+
 def test_cleanup_old_releases(fake_connection):
     conf = SimpleNamespace(releases_dir="/srv/app/releases", keep_releases=1)
     releases_output = "20240101\n20240102\n20240103\n"
