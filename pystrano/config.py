@@ -68,6 +68,16 @@ class PystranoConfig(object):
             raise ValueError(f"Unsupported framework: {framework}")
         setattr(self, "framework", framework)
 
+        package_manager = getattr(self, "package_manager", "pip")
+        package_manager = str(package_manager).strip().lower().replace("-", "").replace("_", "")
+        if package_manager not in {"pip", "uv"}:
+            raise ValueError(f"Unsupported package_manager: {package_manager}")
+        setattr(self, "package_manager", package_manager)
+
+        if not hasattr(self, "dependency_file"):
+            dependency_file = "uv.lock" if package_manager == "uv" else "requirements.txt"
+            setattr(self, "dependency_file", dependency_file)
+
         if hasattr(self, "service_file"):
             setattr(self, "service_file_name", path.basename(self.service_file))
 

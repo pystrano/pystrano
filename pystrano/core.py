@@ -42,8 +42,30 @@ def setup_symlinks(connection: Connection, new_release_dir: str, conf: PystranoC
 
 def install_requirements(connection: Connection, new_release_dir: str, conf: PystranoConfig):
     """Install dependencies in the virtual environment."""
+    install_command = getattr(conf, "dependency_install_command", None)
+    if install_command:
+        with connection.cd(new_release_dir):
+            connection.run(install_command)
+        return
+
+    dependency_file = quote(getattr(conf, "dependency_file", "requirements.txt"))
+    package_manager = getattr(conf, "package_manager", "pip")
+
     with connection.cd(new_release_dir):
-        connection.run(f"{conf.venv_dir}/bin/pip install -r requirements.txt")
+        if package_manager == "uv":
+            connection.run(f"test -x {conf.venv_dir}/bin/uv || {conf.venv_dir}/bin/pip install uv")
+            if dependency_file == "uv.lock":
+                connection.run(
+                    f"UV_PROJECT_ENVIRONMENT={quote(conf.venv_dir)} "
+                    f"{conf.venv_dir}/bin/uv sync --frozen --no-dev"
+                )
+            else:
+                connection.run(
+                    f"{conf.venv_dir}/bin/uv pip install --python {conf.python_path} "
+                    f"-r {dependency_file}"
+                )
+        else:
+            connection.run(f"{conf.venv_dir}/bin/pip install -r {dependency_file}")
 
 
 def collect_static_files(connection: Connection, new_release_dir: str, conf: PystranoConfig):
@@ -129,6 +151,8 @@ def setup_packages(connection: Connection, conf: PystranoConfig):
 def setup_venv(connection: Connection, conf: PystranoConfig):
     """Set up a virtual environment."""
     connection.run(f"python3 -m venv {conf.venv_dir}")
+    if getattr(conf, "package_manager", "pip") == "uv":
+        connection.run(f"{conf.venv_dir}/bin/pip install uv")
     connection.run(f"chown -R {conf.project_user}:{conf.project_user} {conf.venv_dir}")
 
 

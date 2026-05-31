@@ -120,6 +120,29 @@ def test_main_verbose_disables_quiet_mode(tmp_path, mocker):
     )
 
 
+def test_main_dispatches_init_without_loading_config(tmp_path, mocker):
+    runner = CliRunner()
+
+    load_config = mocker.patch("pystrano.deploy.load_config")
+    builder = mocker.patch("pystrano.deploy.build_deployment_config")
+    configure_loggers = mocker.patch("pystrano.deploy._configure_library_loggers")
+
+    result = runner.invoke(
+        deploy.main,
+        ["init", "production", "api", "--deploy-config-dir", str(tmp_path)],
+    )
+
+    assert result.exit_code == 0
+    configure_loggers.assert_called_once_with(False)
+    builder.assert_called_once_with(
+        "production",
+        "api",
+        deploy_config_dir=str(tmp_path),
+        config_file_name="deployment.yml",
+    )
+    load_config.assert_not_called()
+
+
 def test_main_invalid_command(tmp_path, mocker):
     runner = CliRunner()
     mocker.patch("pystrano.deploy.load_config", return_value=[SimpleNamespace()])

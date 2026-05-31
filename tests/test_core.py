@@ -24,6 +24,70 @@ def test_install_requirements(fake_connection):
     )
 
 
+def test_install_requirements_uses_configured_dependency_file(fake_connection):
+    release_dir = "/srv/app/releases/20240101"
+    conf = SimpleNamespace(venv_dir="/home/app/.venv", dependency_file="requirements-prod.txt")
+
+    core.install_requirements(fake_connection, release_dir, conf)
+
+    fake_connection.run.assert_called_once_with(
+        "/home/app/.venv/bin/pip install -r requirements-prod.txt"
+    )
+
+
+def test_install_requirements_uses_uv_lock_sync(fake_connection):
+    release_dir = "/srv/app/releases/20240101"
+    conf = SimpleNamespace(
+        venv_dir="/home/app/.venv",
+        python_path="/home/app/.venv/bin/python",
+        package_manager="uv",
+        dependency_file="uv.lock",
+    )
+
+    core.install_requirements(fake_connection, release_dir, conf)
+
+    fake_connection.run.assert_has_calls(
+        [
+            call("test -x /home/app/.venv/bin/uv || /home/app/.venv/bin/pip install uv"),
+            call(
+                "UV_PROJECT_ENVIRONMENT=/home/app/.venv "
+                "/home/app/.venv/bin/uv sync --frozen --no-dev"
+            ),
+        ]
+    )
+
+
+def test_install_requirements_uses_uv_requirements_file(fake_connection):
+    release_dir = "/srv/app/releases/20240101"
+    conf = SimpleNamespace(
+        venv_dir="/home/app/.venv",
+        python_path="/home/app/.venv/bin/python",
+        package_manager="uv",
+        dependency_file="requirements.txt",
+    )
+
+    core.install_requirements(fake_connection, release_dir, conf)
+
+    fake_connection.run.assert_has_calls(
+        [
+            call("test -x /home/app/.venv/bin/uv || /home/app/.venv/bin/pip install uv"),
+            call(
+                "/home/app/.venv/bin/uv pip install --python /home/app/.venv/bin/python "
+                "-r requirements.txt"
+            ),
+        ]
+    )
+
+
+def test_install_requirements_uses_custom_install_command(fake_connection):
+    release_dir = "/srv/app/releases/20240101"
+    conf = SimpleNamespace(dependency_install_command="uv sync --frozen --no-dev")
+
+    core.install_requirements(fake_connection, release_dir, conf)
+
+    fake_connection.run.assert_called_once_with("uv sync --frozen --no-dev")
+
+
 def test_collect_static_files(fake_connection):
     release_dir = "/srv/app/releases/20240101"
     conf = SimpleNamespace(
@@ -219,6 +283,24 @@ def test_setup_venv(fake_connection):
     fake_connection.run.assert_has_calls(
         [
             call("python3 -m venv /srv/app/.venv"),
+            call("chown -R deployer:deployer /srv/app/.venv"),
+        ]
+    )
+
+
+def test_setup_venv_installs_uv_when_configured(fake_connection):
+    conf = SimpleNamespace(
+        venv_dir="/srv/app/.venv",
+        project_user="deployer",
+        package_manager="uv",
+    )
+
+    core.setup_venv(fake_connection, conf)
+
+    fake_connection.run.assert_has_calls(
+        [
+            call("python3 -m venv /srv/app/.venv"),
+            call("/srv/app/.venv/bin/pip install uv"),
             call("chown -R deployer:deployer /srv/app/.venv"),
         ]
     )
