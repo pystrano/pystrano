@@ -6,7 +6,7 @@ from datetime import datetime
 from click import argument, command, option
 from os import path
 
-from .config import load_config, PystranoConfig
+from .config import CURRENT_CONFIG_VERSION, load_config, PystranoConfig
 from .config_builder import build_deployment_config
 from .core import (
     setup_release_dir,
@@ -121,6 +121,30 @@ def _target_label(server_config: PystranoConfig, context_label: str | None) -> s
     return server_config.host
 
 
+def _config_version(config: PystranoConfig) -> int | None:
+    version = getattr(config, "config_version", None)
+    if version in (None, ""):
+        return None
+    try:
+        return int(version)
+    except (TypeError, ValueError):
+        return None
+
+
+def _warn_about_config_version(server_configurations: list[PystranoConfig]):
+    needs_warning = any(
+        (_config_version(server_config) or 0) < CURRENT_CONFIG_VERSION
+        for server_config in server_configurations
+    )
+    if not needs_warning:
+        return
+
+    logging.warning(
+        "Pystrano 2.x compatibility warning: this deployment config does not declare "
+        "config_version: 2. Review the v2 config fields before running against older setups."
+    )
+
+
 def set_up(
     server_configurations: list[PystranoConfig],
     *,
@@ -130,6 +154,7 @@ def set_up(
 ):
     try:
         started_at = perf_counter()
+        _warn_about_config_version(server_configurations)
 
         for server_config in server_configurations:
             label = _target_label(server_config, context_label)
@@ -186,6 +211,7 @@ def deploy(
 
     try:
         started_at = perf_counter()
+        _warn_about_config_version(server_configurations)
 
         for server_config in server_configurations:
             new_release_dir = f"{server_config.releases_dir}/{timestamp}"

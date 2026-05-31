@@ -48,6 +48,7 @@ def test_build_deployment_config_creates_fastapi_config(tmp_path):
     config_path = tmp_path / "api" / "production" / "deployment.yml"
     data = yaml.safe_load(config_path.read_text())
 
+    assert data["config_version"] == 2
     assert data["common"] == {
         "source_code_url": "git@github.com:example/api.git",
         "framework": "fastapi",
@@ -122,6 +123,7 @@ def test_build_deployment_config_creates_django_config_with_defaults(tmp_path):
     config_path = tmp_path / "web" / "staging" / "deployment.yml"
     data = yaml.safe_load(config_path.read_text())
 
+    assert data["config_version"] == 2
     assert data["common"]["framework"] == "django"
     assert data["common"]["project_user"] == "deploy"
     assert data["common"]["project_root"] == "apps/web"

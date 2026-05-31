@@ -109,6 +109,8 @@ generates the referenced systemd service file, and prompts before overwriting an
 existing file. `pystrano configure <environment> <app>` is accepted as an alias.
 
 ```yaml
+config_version: 2
+
 common:
   source_code_url: "git@github.com:example/example-django-app.git"
   framework: "django"
@@ -141,6 +143,7 @@ servers:
 
 Common fields used by the current implementation:
 
+- `config_version`: Pystrano config format version. Version 2 configs should declare `2`; missing or older values produce a runtime compatibility warning.
 - `source_code_url`: Git repository URL cloned on each deploy.
 - `framework`: Deployment workflow. Supported values are `django` and `fastapi`. Defaults to `django`.
 - `project_root`: Project directory under `/home/<project_user>/`.

@@ -181,10 +181,29 @@ def test_step_helpers_emit_expected_prefixes(caplog):
     assert "✅ All done" in caplog.text
 
 
+def test_warn_about_config_version_emits_for_legacy_config(caplog):
+    server_config = SimpleNamespace(config_version=None)
+
+    with caplog.at_level(logging.WARNING):
+        deploy._warn_about_config_version([server_config])
+
+    assert "Pystrano 2.x compatibility warning" in caplog.text
+
+
+def test_warn_about_config_version_skips_current_config(caplog):
+    server_config = SimpleNamespace(config_version=2)
+
+    with caplog.at_level(logging.WARNING):
+        deploy._warn_about_config_version([server_config])
+
+    assert "compatibility warning" not in caplog.text
+
+
 def test_set_up_invokes_helpers(mocker):
     server_config = SimpleNamespace(
         host="example.com",
         port=2222,
+        config_version=2,
         service_file="/etc/systemd/system/gunicorn.service",
         service_file_name="gunicorn.service",
         secrets=["secret.json"],
@@ -228,6 +247,7 @@ def test_deploy_executes_full_flow(mocker):
         service_file_name="gunicorn.service",
         branch="main",
         framework="django",
+        config_version=2,
     )
     connection = mocker.Mock()
     make_connection = mocker.patch("pystrano.deploy._make_connection", return_value=connection)

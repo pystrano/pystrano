@@ -4,6 +4,9 @@ from yaml import safe_load
 from os import path
 
 
+CURRENT_CONFIG_VERSION = 2
+
+
 class PystranoConfig(object):
     """A class to represent a Pystrano server configuration."""
 
@@ -61,6 +64,9 @@ class PystranoConfig(object):
 
         if hasattr(self, "env_file"):
             setattr(self, "env_vars", self._load_env_file())
+
+        if not hasattr(self, "config_version"):
+            setattr(self, "config_version", None)
 
         framework = getattr(self, "framework", "django")
         framework = str(framework).strip().lower().replace("-", "").replace("_", "")
@@ -131,8 +137,12 @@ def load_config(config_path: str) -> list[PystranoConfig]:
     with open(config_path) as f:
         config = safe_load(f)
 
+    config_version = config.pop("config_version", None)
+
     # Get common configuration
     common_config = config.pop("common")
+    if config_version is not None:
+        common_config["config_version"] = config_version
 
     # Create a cofinguration for each server
     return [create_server_config(server, common_config) for server in config["servers"]]

@@ -1,3 +1,5 @@
+config_version: 2
+
 common:
   source_code_url: "git@github.com:example/example-django-app.git"
   framework: "django"
