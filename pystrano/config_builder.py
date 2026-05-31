@@ -191,6 +191,7 @@ def build_deployment_config(
         common["static_files_command"] = click.prompt("FastAPI static files command")
 
     config = {
+        "config_version": 2,
         "common": common,
         "servers": [
             {

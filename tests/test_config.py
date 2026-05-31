@@ -14,6 +14,7 @@ def test_load_config_normalizes_fields(tmp_path):
     service_file.write_text("[Unit]")
 
     deployment = {
+        "config_version": 2,
         "common": {
             "project_user": "deployer",
             "project_root": "apps/blog",
@@ -65,6 +66,7 @@ def test_load_config_normalizes_fields(tmp_path):
     assert server.secrets[0].endswith("secret.json")
     assert server.service_file_name == Path(service_file).name
     assert server.clone_depth == 1
+    assert server.config_version == 2
 
 
 def test_finalize_config_defaults():
@@ -94,6 +96,7 @@ def test_finalize_config_defaults():
     assert cfg.package_manager == "pip"
     assert cfg.dependency_file == "requirements.txt"
     assert cfg.clone_depth == 1
+    assert cfg.config_version is None
 
 
 def test_finalize_config_defaults_uv_dependency_file():
