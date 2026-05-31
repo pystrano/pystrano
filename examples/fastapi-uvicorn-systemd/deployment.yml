@@ -4,6 +4,8 @@ common:
   project_root: "apps/example-fastapi-app"
   project_user: "deploy"
   venv_dir: ".venv"
+  package_manager: "uv"
+  dependency_file: "uv.lock"
   keep_releases: 5
   system_packages: |
     libpq-dev

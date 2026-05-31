@@ -6,8 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-05-30
+## [2.0.0] - 2026-05-31
 ### Added
+- Added `pystrano init <environment> <app>` for interactively building a new deployment config and starter systemd service file.
+- Added `package_manager` support for `pip` and uv lockfile dependency installation during deploy.
 - Added framework-specific deployment workflows with `framework: django` and `framework: fastapi`.
 - Added FastAPI deployment support with default Alembic migrations and configurable `migration_command`.
 - Added configurable FastAPI static asset command support through `static_files_command`.

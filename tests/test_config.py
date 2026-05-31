@@ -26,6 +26,8 @@ def test_load_config_normalizes_fields(tmp_path):
             "secrets": f"{tmp_path}/secret.json;{tmp_path}/.env",
             "service_file": str(service_file),
             "framework": "fast_api",
+            "package_manager": "uv",
+            "dependency_file": "requirements-prod.txt",
             "run_migrations": "true",
             "collect_static_files": "false",
         },
@@ -55,6 +57,8 @@ def test_load_config_normalizes_fields(tmp_path):
     assert server.run_migrations is True
     assert server.collect_static_files is False
     assert server.framework == "fastapi"
+    assert server.package_manager == "uv"
+    assert server.dependency_file == "requirements-prod.txt"
     assert server.port == 22
     assert server.env_vars == {"DJANGO_SETTINGS_MODULE": "mysite.settings"}
     assert server.ssh_known_hosts == ["github.com", "gitlab.com"]
@@ -87,7 +91,22 @@ def test_finalize_config_defaults():
     assert cfg.run_migrations is False
     assert cfg.collect_static_files is False
     assert cfg.framework == "django"
+    assert cfg.package_manager == "pip"
+    assert cfg.dependency_file == "requirements.txt"
     assert cfg.clone_depth == 1
+
+
+def test_finalize_config_defaults_uv_dependency_file():
+    cfg = PystranoConfig()
+    cfg.update_dict(
+        {
+            "package_manager": "uv",
+        }
+    )
+
+    cfg.finalize_config()
+
+    assert cfg.dependency_file == "uv.lock"
 
 
 def test_finalize_config_accepts_native_boolean_flags():
@@ -146,3 +165,15 @@ def test_finalize_config_rejects_unknown_framework():
         assert "Unsupported framework: flask" in str(exc)
     else:
         raise AssertionError("Expected unsupported framework to fail")
+
+
+def test_finalize_config_rejects_unknown_package_manager():
+    cfg = PystranoConfig()
+    cfg.update_dict({"package_manager": "poetry"})
+
+    try:
+        cfg.finalize_config()
+    except ValueError as exc:
+        assert "Unsupported package_manager: poetry" in str(exc)
+    else:
+        raise AssertionError("Expected unsupported package manager to fail")

@@ -7,6 +7,7 @@ from click import argument, command, option
 from os import path
 
 from .config import load_config, PystranoConfig
+from .config_builder import build_deployment_config
 from .core import (
     setup_release_dir,
     update_source_code,
@@ -273,27 +274,34 @@ def main(
         )
         _configure_library_loggers(verbose)
 
-        # Load server configs for the environment
-        config_path = path.join(deploy_config_dir, app_name, environment_name, config_file_name)
-        server_configurations = load_config(config_path)
-
         context_label = f"{environment_name} {app_name}"
         hide_remote_output = not verbose
 
-        if cmd == "deploy":
-            deploy(
-                server_configurations,
-                dry_run=dry_run,
-                context_label=context_label,
-                hide_remote_output=hide_remote_output,
+        if cmd in {"init", "configure"}:
+            build_deployment_config(
+                environment_name,
+                app_name,
+                deploy_config_dir=deploy_config_dir,
+                config_file_name=config_file_name,
             )
-        elif cmd == "setup":
-            set_up(
-                server_configurations,
-                dry_run=dry_run,
-                context_label=context_label,
-                hide_remote_output=hide_remote_output,
-            )
+        elif cmd in {"deploy", "setup"}:
+            config_path = path.join(deploy_config_dir, app_name, environment_name, config_file_name)
+            server_configurations = load_config(config_path)
+
+            if cmd == "deploy":
+                deploy(
+                    server_configurations,
+                    dry_run=dry_run,
+                    context_label=context_label,
+                    hide_remote_output=hide_remote_output,
+                )
+            else:
+                set_up(
+                    server_configurations,
+                    dry_run=dry_run,
+                    context_label=context_label,
+                    hide_remote_output=hide_remote_output,
+                )
         else:
             logging.error("Invalid command: %s", cmd)
             exit(1)

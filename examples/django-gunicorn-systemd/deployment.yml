@@ -4,6 +4,8 @@ common:
   project_root: "apps/example-django-app"
   project_user: "deploy"
   venv_dir: ".venv"
+  package_manager: "pip"
+  dependency_file: "requirements.txt"
   keep_releases: 5
   system_packages: |
     libpq-dev

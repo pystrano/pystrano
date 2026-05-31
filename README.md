@@ -60,6 +60,15 @@ For an app named `api` and an environment named `production`, create:
 deploy/api/production/deployment.yml
 ```
 
+Build that file interactively:
+
+```bash
+pystrano init production api
+```
+
+The init flow also writes a starter `gunicorn.service` or `uvicorn.service`
+file referenced by the generated config.
+
 Then inspect the remote commands without executing them:
 
 ```bash
@@ -82,6 +91,7 @@ pystrano deploy production api
 Use a different config root or file name when needed:
 
 ```bash
+pystrano init production api --deploy-config-dir ./ops/deploy --config-file-name pystrano.yml
 pystrano deploy production api --deploy-config-dir ./ops/deploy --config-file-name pystrano.yml
 ```
 
@@ -93,6 +103,11 @@ A deployment config contains a `common` section and a `servers` list.
 Values in `common` apply to every server. Values on an individual server override
 the common values for that server.
 
+Use `pystrano init <environment> <app>` to create this file interactively. The
+command writes to `deploy/<app>/<environment>/deployment.yml` by default,
+generates the referenced systemd service file, and prompts before overwriting an
+existing file. `pystrano configure <environment> <app>` is accepted as an alias.
+
 ```yaml
 common:
   source_code_url: "git@github.com:example/example-django-app.git"
@@ -100,6 +115,8 @@ common:
   project_root: "apps/example-django-app"
   project_user: "deploy"
   venv_dir: ".venv"
+  package_manager: "pip"
+  dependency_file: "requirements.txt"
   keep_releases: 5
   system_packages: |
     libpq-dev
@@ -129,6 +146,9 @@ Common fields used by the current implementation:
 - `project_root`: Project directory under `/home/<project_user>/`.
 - `project_user`: Remote user that owns and deploys the app.
 - `venv_dir`: Virtualenv directory under `/home/<project_user>/`.
+- `package_manager`: Dependency installer. Supported values are `pip` and `uv`. Defaults to `pip`.
+- `dependency_file`: Dependency file used during install. Defaults to `requirements.txt` for `pip` and `uv.lock` for `uv`.
+- `dependency_install_command`: Optional exact dependency install command. When set, Pystrano runs it instead of the built-in `pip` or `uv` command.
 - `keep_releases`: Number of release directories to keep. Use `0` or less to keep all.
 - `system_packages`: Extra packages installed during `setup`.
 - `env_file`: Local dotenv file copied to the remote shared directory during deploy.
@@ -164,10 +184,33 @@ timestamped release under:
 ```
 
 The deploy flow clones the configured repository, copies the dotenv file into
-the shared directory, links shared assets, installs `requirements.txt`, links
+the shared directory, links shared assets, installs Python dependencies, links
 configured secrets, optionally runs framework-specific static collection and
 migrations, updates the `current` symlink, optionally restarts the configured
 systemd service, and removes old releases according to `keep_releases`.
+
+For `package_manager: pip`, dependencies are installed with:
+
+```text
+<venv_dir>/bin/pip install -r <dependency_file>
+```
+
+For `package_manager: uv` with `dependency_file: uv.lock`, Pystrano ensures
+`uv` exists in the virtualenv, then runs:
+
+```text
+UV_PROJECT_ENVIRONMENT=<venv_dir> <venv_dir>/bin/uv sync --frozen --no-dev
+```
+
+If `package_manager: uv` is configured with another dependency file, Pystrano
+runs:
+
+```text
+<venv_dir>/bin/uv pip install --python <python_path> -r <dependency_file>
+```
+
+Set `dependency_install_command` when your project needs a custom flow such as
+additional uv flags or dependency groups.
 
 For Django, the framework steps are:
 
