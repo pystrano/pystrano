@@ -1,5 +1,8 @@
 # Pystrano
 
+[![PyPI version](https://img.shields.io/pypi/v/pystrano.svg)](https://pypi.org/project/pystrano/)
+[![Django Packages](https://img.shields.io/badge/Django%20Packages-pystrano-0C4B33.svg)](https://www.djangopackages.org/packages/p/pystrano/)
+
 Capistrano-inspired deployment automation for Django and FastAPI apps.
 
 Pystrano helps you define repeatable SSH-based Python web deployment workflows
